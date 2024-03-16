@@ -13,7 +13,9 @@ var Bot *tb.Bot
 // BotStart 机器人启动
 func BotStart() {
 	setting := tb.Settings{
-		Token:   config.TelegramC.BotToken,
+		Token:   func() string {
+			config.TelegramC.BotToken,
+		}(),
 		Updates: 100,
 		Poller: &tb.LongPoller{Timeout: 10 * time.Second, AllowedUpdates: []string{
 			"message",
