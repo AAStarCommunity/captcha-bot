@@ -1,9 +1,12 @@
 package config
 
 import (
-	"github.com/spf13/viper"
 	"log"
 	"os"
+	"strconv"
+	"strings"
+
+	"github.com/spf13/viper"
 )
 
 var AppPath string
@@ -20,6 +23,21 @@ type Telegram struct {
 	BotToken    string  `mapstructure:"bot_token"`
 	ApiProxy    string  `mapstructure:"api_proxy"`
 	ManageUsers []int64 `mapstructure:"manage_users"`
+}
+
+func (tel *Telegram) GetManageUsers() []int64 {
+	if len(tel.ManageUsers) == 0 {
+		if users := os.Getenv("managers"); len(users) > 0 {
+			if userArr := strings.Split(users, ","); len(userArr) > 0 {
+				tel.ManageUsers = make([]int64, len(userArr))
+				for i, uid := range userArr {
+					uid64, _ := strconv.Atoi(uid)
+					tel.ManageUsers[i] = int64(uid64)
+				}
+			}
+		}
+	}
+	return tel.ManageUsers
 }
 
 var TelegramC Telegram

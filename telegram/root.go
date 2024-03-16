@@ -1,11 +1,13 @@
 package telegram
 
 import (
+	"log"
+	"os"
+	"time"
+
 	"github.com/assimon/captcha-bot/util/config"
 	ulog "github.com/assimon/captcha-bot/util/log"
 	tb "gopkg.in/telebot.v3"
-	"log"
-	"time"
 )
 
 var Bot *tb.Bot
@@ -13,8 +15,12 @@ var Bot *tb.Bot
 // BotStart 机器人启动
 func BotStart() {
 	setting := tb.Settings{
-		Token:   func() string {
-			config.TelegramC.BotToken,
+		Token: func() string {
+			if token := os.Getenv("bot_token"); len(token) > 0 {
+				return token
+			} else {
+				return config.TelegramC.BotToken
+			}
 		}(),
 		Updates: 100,
 		Poller: &tb.LongPoller{Timeout: 10 * time.Second, AllowedUpdates: []string{
@@ -94,7 +100,7 @@ func isManage(chat *tb.Chat, userId int64) bool {
 
 // isRoot 判断是否为超管
 func isRoot(userid int64) bool {
-	for _, id := range config.TelegramC.ManageUsers {
+	for _, id := range config.TelegramC.GetManageUsers() {
 		if userid == id {
 			return true
 		}
