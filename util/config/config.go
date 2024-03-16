@@ -1,9 +1,10 @@
 package config
 
 import (
-	"github.com/spf13/viper"
 	"log"
 	"os"
+
+	"github.com/spf13/viper"
 )
 
 var AppPath string
@@ -55,7 +56,11 @@ func InitConfig() {
 		log.Fatal(err)
 	}
 	AppPath = path
-	viper.SetConfigFile(path + "/config/config.toml")
+	if os.Getenv("Env") == "dev" {
+		viper.SetConfigFile(path + "/config/config.dev.toml")
+	} else {
+		viper.SetConfigFile(path + "/config/config.toml")
+	}
 	err = viper.ReadInConfig()
 	if err != nil {
 		log.Fatal("load config file err:", err)
