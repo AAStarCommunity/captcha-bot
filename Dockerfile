@@ -23,4 +23,5 @@ COPY --from=builder /app/captcha-bot /work/captcha-bot
 
 WORKDIR /work
 
+EXPOSE 80
 ENTRYPOINT ["./captcha-bot"]
