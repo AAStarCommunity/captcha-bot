@@ -2,6 +2,8 @@ package telegram
 
 import (
 	"log"
+	"net/http"
+	"net/url"
 	"os"
 	"time"
 
@@ -35,7 +37,15 @@ func BotStart() {
 	}
 	// 反向代理
 	if config.TelegramC.ApiProxy != "" {
-		setting.URL = config.TelegramC.ApiProxy
+		trans := &http.Transport{
+			Proxy: func(_ *http.Request) (*url.URL, error) {
+				return url.Parse(config.TelegramC.ApiProxy)
+			},
+		}
+		setting.Client = &http.Client{
+			Timeout:   time.Minute,
+			Transport: trans,
+		}
 	}
 	var err error
 	Bot, err = tb.NewBot(setting)
