@@ -35,7 +35,7 @@ func BotStart() {
 			ulog.Sugar.Error(err)
 		},
 	}
-	// 反向代理
+	// 代理
 	if config.TelegramC.ApiProxy != "" {
 		trans := &http.Transport{
 			Proxy: func(_ *http.Request) (*url.URL, error) {
