@@ -1,11 +1,15 @@
 package telegram
 
 import (
+	"log"
+	"net/http"
+	"net/url"
+	"os"
+	"time"
+
 	"github.com/assimon/captcha-bot/util/config"
 	ulog "github.com/assimon/captcha-bot/util/log"
 	tb "gopkg.in/telebot.v3"
-	"log"
-	"time"
 )
 
 var Bot *tb.Bot
@@ -13,7 +17,13 @@ var Bot *tb.Bot
 // BotStart 机器人启动
 func BotStart() {
 	setting := tb.Settings{
-		Token:   config.TelegramC.BotToken,
+		Token: func() string {
+			if token := os.Getenv("bot_token"); len(token) > 0 {
+				return token
+			} else {
+				return config.TelegramC.BotToken
+			}
+		}(),
 		Updates: 100,
 		Poller: &tb.LongPoller{Timeout: 10 * time.Second, AllowedUpdates: []string{
 			"message",
@@ -25,9 +35,17 @@ func BotStart() {
 			ulog.Sugar.Error(err)
 		},
 	}
-	// 反向代理
+	// 代理
 	if config.TelegramC.ApiProxy != "" {
-		setting.URL = config.TelegramC.ApiProxy
+		trans := &http.Transport{
+			Proxy: func(_ *http.Request) (*url.URL, error) {
+				return url.Parse(config.TelegramC.ApiProxy)
+			},
+		}
+		setting.Client = &http.Client{
+			Timeout:   time.Minute,
+			Transport: trans,
+		}
 	}
 	var err error
 	Bot, err = tb.NewBot(setting)
@@ -92,7 +110,7 @@ func isManage(chat *tb.Chat, userId int64) bool {
 
 // isRoot 判断是否为超管
 func isRoot(userid int64) bool {
-	for _, id := range config.TelegramC.ManageUsers {
+	for _, id := range config.TelegramC.GetManageUsers() {
 		if userid == id {
 			return true
 		}

@@ -19,8 +19,9 @@ RUN go build -ldflags '-linkmode external -extldflags "-static"' -o captcha-bot
 
 FROM alpine:latest
 
-COPY --from=builder /app/captcha-bot /work/captcha-bot
+COPY --from=builder /app /work
 
 WORKDIR /work
 
+EXPOSE 80
 ENTRYPOINT ["./captcha-bot"]
