@@ -17,7 +17,8 @@ func main() {
 		http.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
 			counter++
 			w.Header().Set("Access-Control-Allow-Origin", "*")
-			_, _ = fmt.Fprintf(w, "OK, checker: "+strconv.Itoa(counter))
+			w.Header().Set("counter", strconv.Itoa(counter))
+			fmt.Fprintf(w, "OK")
 		})
 		_ = http.ListenAndServe(":80", nil)
 	}()
