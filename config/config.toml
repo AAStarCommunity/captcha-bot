@@ -19,9 +19,9 @@ max_backups=3
 
 #消息模板
 [message]
-join_hint="欢迎 [%s](%s) 加入 %s\n ⚠️本群已开启新成员验证功能，未通过验证的用户无法发言 \n超时未完成验证会被移除本群！ \n⏱本条消息 %d 秒后自动删除\n👇点击下方按钮自助解除禁言"
-captcha_image="欢迎您加入[%s]！\n⚠本群已开启新成员验证功能。\n👆为了证明您不是机器人，请发送以上图片验证码内容\n🤖机器人将自动验证您发送的验证码内容是否正确\n⏱本条验证消息有效期[%d]秒"
-verification_complete="恭喜您成功通过[🤖人机验证]，系统已为您解除禁言限制。\n如若还是无法发言，请重启telegram客户端\n请同时注意群内发言规范，以防永久禁止"
+join_hint="Welcom [%s](%s) to join %s\\!\n ⚠️ This group has enabled new member verification\\.\n User who failed to complete verification in time will be removed from this group\\!\n ⏱ This message will be deleted after %d seconds automatically\\.\n 👇 Click the button below to self\\-unmute\\."
+captcha_image="Welcome to join[%s]!\n⚠This group has enabled new member verification.\n👆Please send the captcha above\n🤖I'll check if it is correct\n⏱This message is vaild in [%d]seconds"
+verification_complete="Welcome to join us!\nYou can restart telegram if you still can't speak.\nPlease also pay attention to the norms of communication to avoid permanent bans."
 block_hint="\\#封禁预警\n[%s](%s) 请注意,您的消息中含有部分违禁词 \n⚠️您已被系统判断为高风险用户，已被封禁\n系统已向超管发送预警信息，若由超管判定为误杀，会及时将您解除封禁。\n您的违禁词包含：%s"
 
 #广告阻止

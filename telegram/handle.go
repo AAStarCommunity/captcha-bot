@@ -64,7 +64,7 @@ func StartCaptcha(c tb.Context) error {
 		File:    tb.FromDisk(imgUrl),
 		Caption: captchaMessage,
 	}
-	refreshCaptchaImageBtn := captchaMessageMenu.Data("🔁刷新验证码", "refreshCaptchaImageBtn", captchaId)
+	refreshCaptchaImageBtn := captchaMessageMenu.Data("🔁Refresh", "refreshCaptchaImageBtn", captchaId)
 	Bot.Handle(&refreshCaptchaImageBtn, refreshCaptcha())
 	captchaMessageMenu.Inline(
 		captchaMessageMenu.Row(refreshCaptchaImageBtn),
@@ -72,7 +72,7 @@ func StartCaptcha(c tb.Context) error {
 	botMsg, err := Bot.Send(c.Chat(), sendMessage, captchaMessageMenu)
 	if err != nil {
 		log.Sugar.Error("[StartCaptcha] send image captcha err:", err)
-		return c.Send("服务器异常~，请稍后再试")
+		return c.Send("Service is busy，please try later")
 	}
 	err = service.SetCaptchaCodeMessageIdByCaptchaId(captchaId, botMsg.ID)
 	if err != nil {
@@ -165,12 +165,12 @@ func VerificationProcess(c tb.Context) error {
 	captchaId, ok := captchaIdObj.(string)
 	if !ok {
 		log.Sugar.Error("Value is not a string")
-		return c.Send("服务器异常~，请稍后再试")
+		return c.Send("Service is busy，please try later")
 	}
 	captchaRecord, err := service.GetRecordByCaptchaId(captchaId)
 	if err != nil {
 		log.Sugar.Error("[VerificationProcess] GetRecordByCaptchaId err:", err)
-		return c.Send("服务器异常~，请稍后再试")
+		return c.Send("Service is busy，please try later")
 	}
 	if captchaRecord.ID <= 0 || captchaRecord.TelegramUserId != c.Sender().ID || captchaRecord.CaptchaStatus != model.CaptchaStatusPending {
 		return c.Send("您在该群没有待验证记录，或已超时，请重新加入后验证")
@@ -178,7 +178,7 @@ func VerificationProcess(c tb.Context) error {
 	// 验证
 	replyCode := c.Message().Text
 	if !captcha.VerifyCaptcha(captchaRecord.CaptchaCode, replyCode) {
-		return c.Send("验证码错误，请重新输入！")
+		return c.Send("Incorrect captcha")
 	}
 	// 解禁用户
 	err = Bot.Restrict(&tb.Chat{ID: captchaRecord.TelegramChatId}, &tb.ChatMember{
@@ -187,7 +187,7 @@ func VerificationProcess(c tb.Context) error {
 	})
 	if err != nil {
 		log.Sugar.Error("[OnTextMessage] unban err:", err)
-		return c.Send("服务器异常~，请稍后重试~")
+		return c.Send("Service is busy，please try later")
 	}
 	err = service.SuccessRecordByCaptchaId(captchaId)
 	if err != nil {
@@ -205,6 +205,8 @@ func VerificationProcess(c tb.Context) error {
 func UserJoinGroup(c tb.Context) error {
 	var err error
 
+	m := c.ChatMember().NewChatMember.Role
+	_ = m
 	if c.ChatMember().NewChatMember.Role != tb.Member {
 		return nil
 	}
@@ -232,10 +234,10 @@ func UserJoinGroup(c tb.Context) error {
 		chat.Title,
 		config.SystemC.JoinHintAfterDelTime)
 	captchaId := uuid.NewV4().String()
-	doCaptchaBtn := joinMessageMenu.URL("👉🏻点我开始人机验证🤖", fmt.Sprintf("https://t.me/%s?start=%s", Bot.Me.Username, captchaId))
+	doCaptchaBtn := joinMessageMenu.URL("👉🏻To Verify🤖", fmt.Sprintf("https://t.me/%s?start=%s", Bot.Me.Username, captchaId))
 	var (
-		manageBanBtn  = joinMessageMenu.Data("👮‍管理员禁止🈲", "manageBanBtn", captchaId)
-		managePassBtn = joinMessageMenu.Data("👮‍管理员通过✅", "managePassBtn", captchaId)
+		manageBanBtn  = joinMessageMenu.Data("👮Ban🈲", "manageBanBtn", captchaId)
+		managePassBtn = joinMessageMenu.Data("👮Pass✅", "managePassBtn", captchaId)
 	)
 	// 按钮点击事件
 	Bot.Handle(&manageBanBtn, ManageBan(), isManageMiddleware)
@@ -366,7 +368,7 @@ func refreshCaptcha() func(c tb.Context) error {
 			})
 		}
 		return c.Respond(&tb.CallbackResponse{
-			Text: "验证码已刷新~",
+			Text: "Refreshed",
 		})
 	}
 }
