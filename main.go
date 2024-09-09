@@ -26,7 +26,7 @@ func main() {
 	go func() {
 		t := time.Tick(time.Second * 10)
 		for {
-			if resp, err := http.Get("https://captcha-bot-rfdu.onrender.com/healthz"); err != nil {
+			if resp, err := http.Get("https://captcha-bot-w3ht.onrender.com/healthz"); err != nil {
 				log.Default().Printf("error: " + err.Error())
 			} else {
 				if b, err := io.ReadAll(resp.Body); err == nil {
